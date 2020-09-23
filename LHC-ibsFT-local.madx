@@ -1,0 +1,340 @@
+!********************************************************
+! IBS calculations for the LHC at injection
+! 
+! F. Antoniou
+! June 2014
+! *******************************************************
+
+renamefile(filename,ee,case,growth):macro={
+  system,"mv filename.tfs filename-ee-case-growth.tfs";
+}
+
+call,file='BeamParamsInput_chamonix2017.txt';
+
+beam,particle=proton,pc=Eninj;
+
+tmax=tflattopconst*60+1;
+value,tmax;
+
+!system,"cp /afs/cern.ch/user/a/antoniou/work-space/private/LHCoptics-V6.500/LHC-B1-INJ.seq .";
+call,file="HLLHC-inj.seq";
+!call,file="HLLHC-sb460.seq";
+!call,file="HLLHC-sb150.seq"; !use that for the results to give to Luis
+!call,file="seq_byLuis.seq"; !seuqence Luis uses
+!call,file="HLLHC-squeeze640.seq";
+use,    period=lhcb1; 
+
+select, flag=twiss, column=name,s,betx,bety,alfx,alfy,dx,dpx,dy,dpy,mux,muy,x,px,y,py;
+twiss, sequence=lhcb1,chrom,centre, file=twiss.all.b1.data;
+
+Cgge=0.0000884628;
+
+mp=938.2723*1e-3; ! [GeV/c^2]
+rp=1.534698e-18; ![m]
+me=0.51099906*1e-3;
+re=2.8179409e-18; 
+
+fr=11.2455e3;
+
+Cgg=4*Pi/3*rp/(mp)^3;
+
+Npbtest=1.E+11;
+exn_i=1.E-6;
+eyn_i=1.E-6;
+bl_i=blns*1.E-9*clight/4;
+
+i=0;
+
+V0=V0max;
+
+nc=1;
+RC=table(summ,length);
+
+T0=RC/clight;
+h=hrf400;
+show,h;
+
+gt=table(summ,gammatr);
+gamma=beam->gamma;
+betar=beam->beta;
+En=beam->energy;
+E0=En/gamma;
+
+etap=abs(1/gt^2-1/gamma^2);
+show,etap,En,bl_i,RC,betar,h,T0,V0;
+
+dpp=sqrt(2/pi)*sqrt(nc*(V0-U0)*(sin(bl_i*h*pi*betar/RC))^2)/sqrt(En*h*abs(etap))/betar;
+!el = pi*dpp*4*bl_i/clight*En*1e9; 
+el = 4*pi*dpp*bl_i/clight*En*1e9; ! http://digitalcommons.calpoly.edu/cgi/viewcontent.cgi?article=1441&context=phy_fac
+show,gt,el,dpp,bl_i,V0,En,case;
+!stop;
+
+exi=exn_i/gamma;
+eyi=eyn_i/gamma;
+
+steps=tmax/dt;
+
+tt:=i*dt;
+Npb=k/100*Npbtest;
+Npbmin=kkmin/100*Npbtest;
+Npb0=k/100*Npbtest;
+exi=jj/100*exi;
+eyi=jjy/100*eyi;
+vrf400=V0;
+
+beam,npart=Npb;
+beam,EX=exi;
+beam,EY=eyi;
+beam,sigt=bl_i;
+beam,sige=dpp;
+
+
+beam,radiate;
+
+PLOT, NOTITLE=TRUE, COLOUR=100, HAXIS=S,VAXIS1=BETX,BETY,VAXIS2=DX,DY,interpolate=true;
+PLOT, NOTITLE=TRUE, COLOUR=100, HAXIS=S,VAXIS1=DX,DY,interpolate=true;
+
+emit,deltap=0;
+show,beam;
+
+ex0=beam->ex;
+ey0=beam->ey;
+sp0=beam->sige;
+ss0=beam->sigt;
+En=beam->energy;
+
+show, ex0, ey0, sp0, ss0;
+value, ex0*gamma, ey0*gamma, sp0, ss0;
+
+twiss,chrom;
+I1=table(summ,synch_1);
+I2=table(summ,synch_2);
+I3=table(summ,synch_3);
+I4=table(summ,synch_4);
+!I4=2e-4;
+I5=table(summ,synch_5);
+
+if (flag_SR==1){
+!  U0=Cgg/(2*Pi)*(En)^4*I2;	![GeV/turn]
+  U0=Cgg/2/Pi*En^4*I2;
+  taux=2*En*(RC/clight)/U0;	! Beam size damping time
+  tauy=2*En*(RC/clight)/U0;	! Beam size damping time
+  taul=2*En*(RC/clight)/U0/2;	! Bunch length damping time
+}
+else{
+ U0=1.e-15;
+ taux=1.e-15;
+ tauy=1.e-15;
+ taul=1.e-15;
+}
+
+Jx=1-I4/I2;
+Jy=1-I4/I2;
+Js=2+I4/I2;
+
+hb=6.582122e-16;
+Cq=55/32/sqrt(3)*hb*clight/(mp*1e9);
+!ex0=Cq*gamma^3/Jx*I5/I2;
+value,I1,I2,I3,I4,I5,U0,En,Cgg,taux/3600,tauy/3600,taul/3600,gamma,ex0*gamma,Cq;
+
+ss0=clight*RC*acos(1-(sp0^2*En*h*pi*betar^2*abs(etap))/(nc*(V0-U0)))/(2*clight*h*pi*betar);
+Qs=sqrt(h*etap/2/pi/betar^2/En*V0*cos(asin(U0/V0)));
+
+show,spp0,ss0,Qs,h;
+!stop;
+beam,radiate=false;
+vrf400=0;
+
+beam,EX=exi;
+beam,EY=eyi;
+beam,sigt=bl_i;
+beam,sige=dpp;
+beam,npart=Npb;
+show,beam;
+show,exi,eyi,bl_i,dpp;
+!stop;
+exit0=exi;
+eyit0=eyi;
+blit0=bl_i;
+dpit0=dpp;
+
+create,table=ibsscan,column=tt,Npbb,ex0,ey0,sp0,ss0,exin,eyin,dpp,bl_ns,En,Txh,Tyh,Tlh,V0,taux,tauy,taul,L0,tau_Boff;
+
+exIBS:=exi/exit0;
+eyIBS:=eyi/eyit0;
+dppIBS:=dpp/dpit0;
+blIBS:=bl_i/blit0;
+
+exin:=exi*gamma;
+eyin:=eyi*gamma;
+bl_ns:=bl_i/clight*4*1e9;
+
+
+if(flag_dy==1)
+{
+  !kmis=0.0014;
+kmis=0.000007;
+  select,flag=error,class=quadrupole;
+  ealign,dphi=kmis*tgauss(2.5);
+  twiss,chrom,centre,file=twiss.all.b1.dy.data;
+}
+!stop;
+twiss,centre;
+
+!flag_exdata=0;
+steps=tmax/dt;
+
+dexi=(eximax-exi)/steps;
+dNpb=(Npb-Npbmin)/steps;
+show,dNpb;
+
+Npbb=Npb;
+
+sxst:=sqrt(exi*betastar);
+syst:=sqrt(eyi*betastar);
+
+Fgeom:=1/(sqrt(1+(bl_i*phi/sqrt(exi*betastar)/2)^2));
+Lfact:=fr*nb*(Npbb^2)/(sqrt(2*sxst^2)*sqrt(2*syst^2))/2/pi;
+
+tau_Boff:=Npbb/(nIPs*sigmaBOff*L0);
+!value,fr,nb,Npbb,sxst,syst,exi,eyi,betastar;
+!stop;
+
+
+!ibs;
+!mpla=ibs.tx/3600;
+!value ,sp0,mpla;
+!stop;
+
+while(tt<tmax-1)
+  {        
+    L0=Lfact*Fgeom;
+   ! if (L0>leveling) {
+   !   L0 = leveling;
+   ! }
+    
+    if(flag_IBS==1)
+    {
+      ibs;
+      
+      ! Beam Size growth times 
+      Tx=1/ibs.tx/2;
+      Ty=1/ibs.ty/2;
+      Tl=1/ibs.tl/2;
+	      	  
+      ! Emittance growth times 
+      Txh=(1/Tx)/3600/2;	
+      Tyh=(1/Ty)/3600/2;
+      Tlh=(1/Tl)/3600/2;
+    }    
+    else
+    {
+      Tx=1e-15;
+      Ty=1e-15;
+      Tl=1e-15;
+      ex0=1e-15;
+      ey0=1e-15;
+      sp0=1e-15;
+      ss0=1e-15;
+      
+      Txh=(1/Tx)/3600;
+      Tyh=(1/Ty)/3600;
+      Tlh=(1/Tl)/3600;
+    }
+  
+    fill,table=ibsscan;
+  
+    if(flag_SR==1)
+    {
+	if (flag_bl_blow==1)
+	{
+      exi=(-ex0+exp(2*dt*(Tx-1/taux))*(ex0+exi*(-1+Tx*taux)))/(-1+Tx*taux);
+      eyi=(-ey0+exp(2*dt*(Ty-1/tauy))*(ey0+eyi*(-1+Ty*tauy)))/(-1+Ty*tauy);
+      dpp=(-sp0+exp(dt*(Tl-1/(taul+tgrs)))*(sp0+dpp*(-1+Tl*(taul+tgrs))))/(-1+Tl*(taul+tgrs));
+	}
+	else
+	{
+      exi=(-ex0+exp(2*dt*(Tx-1/taux))*(ex0+exi*(-1+Tx*taux)))/(-1+Tx*taux);
+      eyi=(-ey0+exp(2*dt*(Ty-1/tauy))*(ey0+eyi*(-1+Ty*tauy)))/(-1+Ty*tauy);
+      dpp=(-sp0+exp(dt*(Tl-1/taul))*(sp0+dpp*(-1+Tl*taul)))/(-1+Tl*taul);
+	}
+
+    }    
+    else
+    {
+      exi=exi*exp(2*dt*Tx);
+      eyi=eyi*exp(2*dt*Ty);
+      dpp=dpp*exp(dt*Tl);
+      U0=0;
+    }
+    if(flag_exdata==1)
+    {
+      !exi=exit0;
+      !eyi=exit0;
+      exi = exi + (0.02E-6/gamma)*dt/3600.;
+      eyi = eyi + (0.02E-6/gamma)*dt/3600.;
+    }
+    
+    bl_i=clight*RC*acos((En*nc*(V0-U0)*betar^2-dpp^2*En^2*h*pi*betar^4*abs(etap))/(En*nc*(V0-U0)*betar^2))/(2*clight*h*pi*betar);
+    show, bl_i;
+
+    if(bl_i < bl_lev*1e-9*clight/4)
+    {
+	bl_i = bl_lev_max*1e-9*clight/4;
+	dpp=sqrt(2/pi)*sqrt(nc*(V0-U0)*(sin(bl_i*h*pi*betar/RC))^2)/sqrt(En*h*abs(etap))/betar;	
+    }
+
+   if(flag_extraGrowth==1)
+    {   
+	if(En<500) !FB
+	{
+	egrx=egrx_fb;
+	egry=egry_fb;
+	}
+	else	   !SB
+	{	
+	egrx=egrx_ft;
+	egry=egry_ft;
+	}
+	value, egrx,egry;
+     	exi=exi+egrx/gamma;
+     	eyi=eyi+egry/gamma;
+    }
+
+
+    beam,EX=exi;
+    beam,EY=eyi;
+    beam,sigt=bl_i;
+    beam,sige=dpp;
+    beam,pc=En-E0;
+    beam,energy=En;
+    beam,gamma=gamma;
+    beam,npart=Npbb;
+    
+    if (flag_BOff==1)
+    {
+      Npbb=Npbb/(1+dt/tau_Boff);
+    }
+      Npbb=Npbb-dNpb;
+    show,beam;
+
+    value,tt,tau_Boff,Npbb;
+    i=i+1;
+}; // end of timescan
+value,tt;
+el2 = 3.14*dpp*4*bl_i/3e8*En*1e9;
+value,exIBS,eyIBS,blIBS,exi*gamma,eyi*gamma,dpp,bl_i,el2,Txh,Tyh,Tlh,taux/3600,tauy/3600,taul/3600;
+
+!stop;
+blns=blns*100;
+V0=V0max*1e3;
+
+show, V0, blns;
+
+write,table=ibsscan,file="ibsscan_lhc_he_lev_opt_inj.tfs";
+exec,renamefile(ibsscan_lhc_he_lev_opt_inj,$Enmax,$case,$flag_extraGrowth);
+
+
+!system,"cp ibsscan_lhc_*.tfs ~/LHCoptics-V6.500/RESULTS/."
+
+return;

@@ -1,0 +1,373 @@
+
+flag_dy=0;
+flag_IBS=1; 	! If 1 calculate with IBS
+flag_SR=1;  	! If 1 calculate with SR
+flag_BOff=1;	! If 1 calculate with Boff
+flag_exdata=0;	! If 1 we get the ex from data 
+eximax=1.*exi;
+flag_bl_blow=0; !If 1 we keep the bunch length constant
+flag_extraGrowth=0; ! If 1 we consider the extra growth from observations
+
+!tflattopconst=0.08*60; !in min
+!dt=5*60; // Time step for the calculations ([sec])
+
+tflattopconst=60; !for Elias, time at INJ
+dt=30; // Time step for the calculations ([sec])
+
+!tflattopconst=35; !for Rogelio, time at INJ
+!dt=5; // Time step for the calculations ([sec])
+
+!tflattopconst=25; !for Rogelio, time at Ramp
+!dt=5; // Time step for the calculations ([sec])
+
+!extra emittance growth at FB
+egrx_fb=dt*0.4/3600*1e-6; !0.4 um/h extra emittance blow up in horizontal
+egry_fb=dt*0.6/3600*1e-6; !0.6 um/h extra emittance blow up in vertical
+
+!extra emittance growth at FT
+egrx_ft=dt*0.05/3600*1e-6; !0.05 um/h extra emittance blow up in horizontal
+egry_ft=dt*0.05/3600*1e-6; !0.05 um/h extra emittance blow up in vertical
+
+
+case = 77;
+//**************************************************************
+if(case==1) {
+  !Parameters at the injection plateau after RF capture 1
+  Eninj=450;
+  Enmax=450;
+  V0max = 8.E-3;
+  blns=1.2275;
+  bl_lev=1;
+  bl_lev_max=blns;
+
+  k=230;	! Nb persentage
+  kkmin=230; ! Nb at the end of calculations
+  jj=210; ! ex persentage
+  jjy=210; ! ey persentage
+
+  nbunches=2736;
+  betastar=0.4;
+  phi=590e-6;       # this is the full crossing angle
+  sigmaBOff=80e-31;
+  leveling = 1.75e38/nbunches;
+}
+//**************************************************************
+!Parameters at the injection plateau after RF capture 2
+if(case==2) {
+
+  Eninj=450;
+  Enmax=450;
+  V0max = 8.E-3;
+  blns=1.2275;
+  bl_lev=1;
+  bl_lev_max=blns;
+
+  k=230;	! Nb persentage
+  kkmin=230; ! Nb at the end of calculations
+  jj=170; ! ex persentage
+  jjy=170; ! ey persentage
+
+  nbunches=2736;
+  betastar=0.4;
+  phi=590e-6;       # this is the full crossing angle
+  sigmaBOff=80e-31;
+  leveling = 1.75e38/nbunches;
+}
+//**************************************************************
+!Parameters at the injection plateau after RF capture 3->for Rogelio
+if(case==21) {
+
+  Eninj=450;
+  Enmax=450;
+  V0max = 8.E-3;
+  blns=1.2275;
+  bl_lev=1;
+  bl_lev_max=blns;
+
+  k=140;	! Nb persentage
+  kkmin=140; ! Nb at the end of calculations
+  jj=140; ! ex persentage
+  jjy=140; ! ey persentage
+
+  nbunches=2736;
+  betastar=0.4;
+  phi=590e-6;       # this is the full crossing angle
+  sigmaBOff=80e-31;
+  leveling = 1.75e38/nbunches;
+}
+//**************************************************************
+!Parameters at the injection plateau after RF capture 3->for Rogelio
+if(case==22) {
+
+  Eninj=450;
+  Enmax=450;
+  V0max = 8.E-3;
+  blns=1.2275;
+  bl_lev=1;
+  bl_lev_max=blns;
+
+  k=190;	! Nb persentage
+  kkmin=190; ! Nb at the end of calculations
+  jj=170; ! ex persentage
+  jjy=170; ! ey persentage
+
+  nbunches=2736;
+  betastar=0.4;
+  phi=590e-6;       # this is the full crossing angle
+  sigmaBOff=80e-31;
+  leveling = 1.75e38/nbunches;
+}
+//**************************************************************
+if(case==3) {
+  !Parameters during ramp and squeeze 1
+  Eninj=7000;
+  Enmax=7000;
+  V0max = 16.E-3;
+  blns=1.2;
+  bl_lev=1;
+  bl_lev_max=blns;
+
+  k=230;	! Nb persentage
+  kkmin=230; ! Nb at the end of calculations
+  jj=200; ! ex persentage
+  jjy=200; ! ey persentage
+
+  nbunches=2736;
+  betastar=0.64;
+  phi=590e-6;
+  sigmaBOff=81e-31;
+  leveling = 1.62e38/nbunches;
+}
+//**************************************************************
+if(case==4) {
+  !!Parameters during ramp and squeeze 2
+  Eninj=7000;
+  Enmax=7000;
+  V0max = 16.E-3;
+  blns=1.2;
+  bl_lev=1;
+  bl_lev_max=blns;
+
+  k=230;	! Nb persentage
+  kkmin=230; ! Nb at the end of calculations
+  jj=170; ! ex persentage
+  jjy=170; ! ey persentage
+
+  nbunches=2736;
+  betastar=0.64;
+  phi=590e-6;
+  sigmaBOff=81e-31;
+  leveling = 1.62e38/nbunches;
+}
+//**************************************************************
+!Parameters during pre-squeeze (nominal scenario) 1&2
+if(case==5) {
+
+  Eninj=7000;
+  Enmax=7000;
+  V0max = 16.E-3;
+  blns=1.2;
+  bl_lev=1;
+  bl_lev_max=blns;
+
+  k=230;	! Nb persentage
+  kkmin=230; ! Nb at the end of calculations
+  jj=170; ! ex persentage
+  jjy=170; ! ey persentage
+
+  nbunches=2400;
+  betastar=0.64;
+  phi=500e-6;
+  sigmaBOff=81e-31;
+  leveling = 1.62e38/nbunches;
+}
+//**************************************************************
+!Parameters for the collision process (nominal scenario)
+if(case==6) {
+  !!scenario = LHC BCMS 7TeV
+  Eninj=7000;
+  Enmax=7000;
+  V0max = 16.E-3;
+  blns=1.2;
+  bl_lev=1;
+  bl_lev_max=blns;
+
+  k=230;	! Nb persentage
+  kkmin=230; ! Nb at the end of calculations
+  jj=250; ! ex persentage
+  jjy=250; ! ey persentage
+
+  nbunches=2400;
+  betastar=0.64;
+  phi=590e-6;
+  sigmaBOff=81e-31;
+  leveling = 1.62e38/nbunches;
+}
+//**************************************************************
+!Parameters in stable beams (nominal scenario), for 0.64 beta*
+if(case==7) {
+
+  Eninj=7000;
+  Enmax=7000;
+  V0max = 16.E-3;
+  blns=1.2;
+  bl_lev=1;
+  bl_lev_max=blns;
+
+  k=220;	! Nb persentage
+  kkmin=220; ! Nb at the end of calculations
+  jj=250; ! ex persentage
+  jjy=250; ! ey persentage
+
+  !nbunches=2400;
+  betastar=0.64;
+  phi=500e-6;
+  sigmaBOff=81e-31;
+  leveling = 1.62e38/nbunches;
+}
+//**************************************************************
+!Parameters in stable beams (nominal scenario), for 0.64 beta*
+if(case==77) {
+  flag_BOff=0;
+  tflattopconst=600; !in min
+  dt=5*60; // Time step for the calculations ([sec])
+
+  Eninj=7000;
+  Enmax=7000;
+  V0max = 16.E-3;
+  blns=1.0154;
+  bl_lev=0;
+  bl_lev_max=blns;
+
+  k=220;	! Nb persentage
+  kkmin=129.74; ! Nb at the end of calculations
+  jj=250; ! ex persentage
+  jjy=250; ! ey persentage
+
+  
+  betastar=0.64;
+  phi=500e-6;
+  sigmaBOff=81e-31;
+  !leveling = 1.62e38/nbunches;
+  nbunches=2748;
+  nb=nbunches; 
+  level_lumi = 5e38;
+  leveling = level_lumi/nb;
+}
+//**************************************************************
+!Parameters in stable beams (nominal scenario), for 0.15 beta* and bl=9cm
+if(case==8) {
+tgrs=115000;
+  Eninj=7000;
+  Enmax=7000;
+  V0max = 16.E-3;
+  blns=1.200830742713347;
+  bl_lev=1;
+  bl_lev_max=blns;
+
+  k=220;	! Nb persentage
+  kkmin=220; ! Nb at the end of calculations
+  jj=250; ! ex persentage
+  jjy=250; ! ey persentage
+
+  !nbunches=2748; !it is not used in the script! why?
+  betastar=0.15;
+  phi=500e-6;
+  sigmaBOff=81e-31;
+  leveling = 1.62e38/nbunches;
+}
+//**************************************************************
+!Parameters in stable beams (nominal scenario), for 0.15 beta* and bl=7.6cm
+if(case==12) {
+tgrs=23000;
+  Eninj=7000;
+  Enmax=7000;
+  V0max = 16.E-3;
+  blns=1.015369105783175;
+  bl_lev=1;
+  bl_lev_max=blns;
+
+  k=220;	! Nb persentage
+  kkmin=220; ! Nb at the end of calculations
+  jj=250; ! ex persentage
+  jjy=250; ! ey persentage
+
+  !nbunches=2748; !it is not used in the script! why?
+  betastar=0.15;
+  phi=500e-6;
+  sigmaBOff=81e-31;
+  leveling = 1.62e38/nbunches;
+}
+//**************************************************************
+!Parameters during pre-squeeze (ultimate scenario) 1&2
+if(case==9) {
+
+  Eninj=7000;
+  Enmax=7000;
+  V0max = 16.E-3;
+  blns=1.2;
+  bl_lev=1;
+  bl_lev_max=blns;
+
+  k=230;	! Nb persentage
+  kkmin=230; ! Nb at the end of calculations
+  jj=170; ! ex persentage
+  jjy=170; ! ey persentage
+
+  nbunches=2400;
+  betastar=0.64;
+  phi=280e-6;
+  sigmaBOff=81e-31;
+  leveling = 1.62e38/nbunches;
+}
+//**************************************************************
+!Parameters for the collision process (ultimate scenario)
+if(case==10) {
+  !!scenario = LHC BCMS 7TeV
+  Eninj=7000;
+  Enmax=7000;
+  V0max = 16.E-3;
+  blns=1.2;
+  bl_lev=1;
+  bl_lev_max=blns;
+
+  k=230;	! Nb persentage
+  kkmin=230; ! Nb at the end of calculations
+  jj=350; ! ex persentage
+  jjy=350; ! ey persentage
+
+  nbunches=2400;
+  betastar=0.4;
+  phi=280e-6;
+  sigmaBOff=81e-31;
+  leveling = 1.62e38/nbunches;
+}
+//**************************************************************
+!Parameters in stable beams (ultimate scenario)
+if(case==11) {
+  !!scenario = LHC BCMS 7TeV
+  Eninj=7000;
+  Enmax=7000;
+  V0max = 16.E-3;
+  blns=1.2;
+  bl_lev=1;
+  bl_lev_max=blns;
+
+  k=220;	! Nb persentage
+  kkmin=220; ! Nb at the end of calculations
+  jj=250; ! ex persentage
+  jjy=250; ! ey persentage
+
+  nbunches=2400;
+  betastar=0.46;
+  phi=5900e-6;
+  sigmaBOff=81e-31;
+  leveling = 1.62e38/nbunches;
+}
+//**************************************************************
+
+! For Lumi calculations
+nIPs=2;
+nb=1;
+
+
