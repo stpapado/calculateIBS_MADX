@@ -1,0 +1,48 @@
+!for HL-LHC use:
+!injection: /afs/cern.ch/eng/lhc/optics/HLLHCV1.3/opt_inj.madx 
+!pre-squeeze: /afs/cern.ch/eng/lhc/optics/HLLHCV1.3/squeeze2/opt_squeeze_640_3000.madx
+!beginning of the fill: 60cm beta*, use I=2.2e11 p/bunch:  /afs/cern.ch/eng/lhc/optics/HLLHCV1.3/squeeze2/opt_squeeze_600_3000.madx 
+!end of levelling: 15cm beta*, use I=1.275e11 p/bunch: /afs/cern.ch/eng/lhc/optics/HLLHCV1.3/squeeze2/opt_150_150_150_150.madx
+
+Option, -echo,-warn,-info;
+call,file="/afs/cern.ch/eng/lhc/optics/runIII/lhc.seq";
+call,file="/afs/cern.ch/eng/lhc/optics/HLLHCV1.3/hllhc_sequence.madx";
+Option, -echo,warn,-info;
+
+call,file="/afs/cern.ch/eng/lhc/optics/HLLHCV1.3/toolkit/macro.madx";
+
+
+NRJ=450;
+Beam,particle=proton,energy=NRJ,sequence=lhcb1,bv= 1;
+Beam,particle=proton,energy=NRJ,sequence=lhcb2,bv=-1;
+call,file="/afs/cern.ch/eng/lhc/optics/HLLHCV1.3/opt_inj.madx";
+exec,check_ip(b1); exec,check_ip(b2);
+save,sequence=lhcb1,file="HLLHC-inj.seq";
+
+
+/*
+NRJ=7000;
+Beam,particle=proton,energy=NRJ,sequence=lhcb1,bv= 1;
+Beam,particle=proton,energy=NRJ,sequence=lhcb2,bv=-1;
+call,file="/afs/cern.ch/eng/lhc/optics/HLLHCV1.3/squeeze2/opt_squeeze_640_3000.madx";
+exec,check_ip(b1); exec,check_ip(b2);
+save,sequence=lhcb1,file="HLLHC-squeeze640.seq";
+*/
+
+/*
+NRJ=7000;
+Beam,particle=proton,energy=NRJ,sequence=lhcb1,bv= 1;
+Beam,particle=proton,energy=NRJ,sequence=lhcb2,bv=-1;
+call,file="/afs/cern.ch/eng/lhc/optics/HLLHCV1.3/squeeze2/opt_460_460_460_460.madx";
+exec,check_ip(b1); exec,check_ip(b2);
+save,sequence=lhcb1,file="HLLHC-sb460.seq";
+*/
+
+/*
+NRJ=7000;
+Beam,particle=proton,energy=NRJ,sequence=lhcb1,bv= 1;
+Beam,particle=proton,energy=NRJ,sequence=lhcb2,bv=-1;
+call,file="/afs/cern.ch/eng/lhc/optics/HLLHCV1.3/squeeze2/opt_150_150_150_150.madx"; ! collision optics 40cm
+exec,check_ip(b1); exec,check_ip(b2);
+save,sequence=lhcb1,file="HLLHC-sb150.seq";
+*/
